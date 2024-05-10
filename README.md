@@ -4,7 +4,9 @@ This Dockerfile sets up a Minecraft server based on Debian stable. WIP.
 
 To test image creation, run:
 ```
-docker build . -t minecraft:vanilla; docker run -d minecraft:vanilla
+docker build --build-arg EULA=true -t minecraft . && \
+docker run -d --name minecraft --rm minecraft && \
+docker logs -f minecraft
 ```
 
 ## Copyright and License
