@@ -1,0 +1,24 @@
+volumes:
+  minecraft:
+
+services:
+  minecraft:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VERSION: ${VERSION:-latest}
+        JAVA_VERSION: ${JAVA_VERSION:-latest}
+    image: ${IMAGE:-minecraft}:${TAG:-latest}
+    ports:
+      - "0.0.0.0:25565:25565"
+    #volumes:
+    #  - minecraft:/app/world
+    environment:
+      EULA: "${EULA:-false}"
+      DEBUG: "${DEBUG:-false}"
+      JVM_OPTS: "-Xms1G -Xmx2G"
+      SETTINGS_gamemode: "${GAMEMODE:-survival}"
+      SETTINGS_hardcore: "${HARDCORE:-false}"
+      SETTINGS_motd: "${MOTD:-A Minecraft Server}"
+      SETTINGS_pvp: "${PVP:-true}"

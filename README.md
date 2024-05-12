@@ -1,12 +1,17 @@
 # Minecraft Docker Image
+This Dockerfile sets up a Minecraft server based on the `debian-slim` image.
 
-This Dockerfile sets up a Minecraft server based on Debian stable. WIP.
-
-To test image creation, run:
+By running the following and building this image, you are agreeing to
+[Minecraft's EULA](https://www.minecraft.net/en-us/eula):
 ```
-docker build --build-arg EULA=true -t minecraft . && \
-docker run -d --name minecraft --rm minecraft && \
-docker logs -f minecraft
+echo "EULA=true" > .env
+```
+
+To build and test the image:
+```
+docker compose build
+docker compose up -d
+docker logs -f minecraft-minecraft-1
 ```
 
 ## Copyright and License
