@@ -1,6 +1,3 @@
-volumes:
-  minecraft:
-
 services:
   minecraft:
     build:
@@ -12,12 +9,10 @@ services:
     image: ${IMAGE:-minecraft}:${TAG:-latest}
     ports:
       - "0.0.0.0:25565:25565"
-    #volumes:
-    #  - minecraft:/app/world
     environment:
       EULA: "${EULA:-false}"
       DEBUG: "${DEBUG:-false}"
-      JVM_OPTS: "-Xms1G -Xmx2G"
+      JVM_OPTS: "${JAVA_OPTS:--Xms1G -Xmx2G}"
       SETTINGS_gamemode: "${GAMEMODE:-survival}"
       SETTINGS_hardcore: "${HARDCORE:-false}"
       SETTINGS_motd: "${MOTD:-A Minecraft Server}"

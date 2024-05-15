@@ -10,7 +10,7 @@ RUN groupadd -g 1000 minecraft && \
 
 # Install scripting dependencies
 RUN apt-get update && \
-    apt-get install -y curl gpg jq screen && \
+    apt-get install -y curl gpg jq procps screen strace && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
