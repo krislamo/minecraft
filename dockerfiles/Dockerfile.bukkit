@@ -1,0 +1,71 @@
+# Build from OpenJDK image
+FROM "${JDK_IMAGE:-localhost/minecraft-jdk}":"${JDK_TAG:-latest}" as build
+
+# Minecraft version
+ARG VERSION=latest
+
+# Defaults to building Spigot over CraftBukkit
+ARG SPIGOT=true
+
+# SpigotMC BuildTools URL
+ARG BASE_URL="https://hub.spigotmc.org/jenkins/job/BuildTools/"
+ARG ARTIFACT_PATH="lastSuccessfulBuild/artifact/target/BuildTools.jar"
+
+# Build in common container location
+WORKDIR /build
+
+# Download and build Spigot using BuildTools
+RUN set -ux && \
+# Grab latest version if not specified
+  if [ "$VERSION" = "latest" ]; then \
+    VERSION="$( \
+      curl -s https://launchermeta.mojang.com/mc/game/version_manifest.json \
+        | jq -r '.latest.release' \
+    )"; \
+  fi && \
+  # Download BuildTools.jar
+  curl -s -o BuildTools.jar "${BASE_URL}${ARTIFACT_PATH}" && \
+  # Build Craftbukkit if SPIGOT is false
+  case "$SPIGOT" in \
+    true) \
+      BUILD_TYPE='SPIGOT' ;; \
+    false) \
+      BUILD_TYPE='CRAFTBUKKIT' ;; \
+    *) \
+      echo "ERROR: Invalid value for SPIGOT. Set to 'true' or 'false'"; \
+      exit 1 ;; \
+  esac && \
+  # Run BuildTools to build specified version
+  java -jar BuildTools.jar --rev "$VERSION" --compile "$BUILD_TYPE" && \
+  ln -s \
+    "$(echo $BUILD_TYPE | tr '[:upper:]' '[:lower:]')-${VERSION}.jar" \
+    "server.jar"
+
+# Use OpenJRE image for runtime
+FROM "${JRE_IMAGE:-localhost/minecraft-jre}":"${JRE_TAG:-latest}" as runtime
+
+# Run as Minecraft user
+USER minecraft
+WORKDIR /app
+
+# Copy the built bukkit jar from the build stage
+COPY --from=build /build/server.jar /app/server.jar
+
+# Generate initial settings
+RUN java -jar server.jar --initSettings --nogui
+
+# Back to root to copy the entrypoint in
+USER root
+WORKDIR /app
+
+# Copy in entrypoint script
+COPY ../entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Run app as minecraft user
+USER minecraft
+WORKDIR /app
+
+# Expose port and run entrypoint script
+EXPOSE 25565
+ENTRYPOINT ["entrypoint.sh"]

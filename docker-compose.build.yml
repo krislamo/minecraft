@@ -1,0 +1,58 @@
+services:
+  minecraft-jre:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.java
+      args:
+        JAVA_VERSION: ${JAVA_VERSION:-latest}
+        JAVA_RUNTIME: 'true'
+    image: ${JRE_IMAGE:-localhost/minecraft-jre}:${JRE_TAG:-latest}
+
+  minecraft-jdk:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.java
+      args:
+        JAVA_VERSION: ${JAVA_VERSION:-latest}
+        JAVA_RUNTIME: 'false'
+    image: ${JDK_IMAGE:-localhost/minecraft-jdk}:${JDK_TAG:-latest}
+
+  minecraft-vanilla:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.vanilla
+      args:
+        VERSION: ${VERSION:-latest}
+    image: ${VANILLA_IMAGE:-localhost/minecraft}:${VANILLA_TAG:-latest}
+    depends_on:
+      - minecraft-jre
+    environment:
+      EULA: "${EULA:-false}"
+
+  minecraft-spigot:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.bukkit
+      args:
+        VERSION: ${MINECRAFT_VERSION:-latest}
+        SPIGOT: 'true'
+    image: ${SPIGOT_IMAGE:-localhost/minecraft}:${SPIGOT_TAG:-latest-spigot}
+    depends_on:
+      - minecraft-jre
+      - minecraft-jdk
+    environment:
+      EULA: "${EULA:-false}"
+
+  minecraft-craftbukkit:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.bukkit
+      args:
+        VERSION: ${MINECRAFT_VERSION:-latest}
+        SPIGOT: 'false'
+    image: ${CRAFTBUKKIT_IMAGE:-localhost/minecraft}:${CRAFTBUKKIT_TAG:-latest-craftbukkit}
+    depends_on:
+      - minecraft-jre
+      - minecraft-jdk
+    environment:
+      EULA: "${EULA:-false}"

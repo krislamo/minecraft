@@ -1,0 +1,49 @@
+FROM "${JRE_IMAGE:-localhost/minecraft-jre}":"${JRE_TAG:-latest}"
+
+# Minecraft version to download
+ARG VERSION=latest
+
+# Download files and run as user
+USER minecraft
+WORKDIR /app
+
+# Download and verify sha1sum for server.jar
+RUN set -ux && \
+# Grab latest version if not specified
+  if [ "$VERSION" = "latest" ]; then \
+    VERSION="$( \
+      curl -s https://launchermeta.mojang.com/mc/game/version_manifest.json \
+        | jq -r '.latest.release' \
+    )"; \
+  fi && \
+  # Get server.jar based on $VERSION
+  curl -s https://launchermeta.mojang.com/mc/game/version_manifest.json \
+    | jq -r --arg id "$VERSION" '.versions[] | select(.id == $id) | .url' \
+    | xargs curl -s | jq -r '.downloads.server' | tee "/tmp/dl.json" \
+    | jq -r '.url' | xargs curl -s -o server.jar && \
+  # Get SHA1 hash of server.jar and compare
+  SHA1="$(sha1sum server.jar | awk '{print $1}')" && \
+  EXPECTED="$(jq -r .sha1 /tmp/dl.json)"; rm /tmp/dl.json && \
+  if [ ! "$SHA1" = "$EXPECTED" ]; then \
+    echo "[ERROR] SHA1=\"$SHA1\" expected \"$EXPECTED\""; \
+    exit 1; \
+  fi
+
+# Generate initial settings
+RUN java -jar server.jar --initSettings --nogui
+
+# Back to root to copy the entrypoint in
+USER root
+WORKDIR /app
+
+# Copy in entrypoint script
+COPY ../entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Run app as minecraft user
+USER minecraft
+WORKDIR /app
+
+# Expose port and run entrypoint script
+EXPOSE 25565
+ENTRYPOINT ["entrypoint.sh"]
