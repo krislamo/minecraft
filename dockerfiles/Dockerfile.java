@@ -11,7 +11,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Eclipse Adoptium DEB installer package
-RUN set -ux && \
+RUN set -eux && \
   # Download the Eclipse Adoptium GPG key
   curl -s https://packages.adoptium.net/artifactory/api/gpg/key/public \
     | gpg --dearmor | tee /etc/apt/trusted.gpg.d/adoptium.gpg > /dev/null && \
@@ -21,7 +21,7 @@ RUN set -ux && \
     | tee /etc/apt/sources.list.d/adoptium.list
 
 # Install Adoptium Temurin (OpenJDK/OpenJRE)
-RUN set -ux && \
+RUN set -eux && \
   # Grab latest LTS version if not specified
   if [ "$JAVA_VERSION" = "latest" ]; then \
     JAVA_VERSION="$( \

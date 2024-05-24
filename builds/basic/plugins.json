@@ -1,0 +1,39 @@
+{
+  "plugins": [
+    {
+      "name": "EssentialsX",
+      "version": "2.20.1",
+      "hash": "sha256:802ea30bda460ca4597e818925816933c123b08d8126a814fac28d03a61bf542",
+      "url": "https://github.com/EssentialsX/Essentials/releases/download/${version}/EssentialsX-${version}.jar",
+      "info_url": "https://essentialsx.net/wiki/Home.html"
+    },
+    {
+      "name": "EssentialsXChat",
+      "version": "2.20.1",
+      "hash": "sha256:40aa5c20241ceb3007ebcb5cfbf19bf2c467b0c090ae50e70653ee87ab775ca6",
+      "url": "https://github.com/EssentialsX/Essentials/releases/download/${version}/EssentialsXChat-${version}.jar",
+      "info_url": "https://essentialsx.net/wiki/Module-Breakdown.html#essentialsx-chat"
+    },
+    {
+      "name": "EssentialsXSpawn",
+      "version": "2.20.1",
+      "hash": "sha256:650d7c6a33865a02c5ffa4eb710def28e73d972c9aef85b2b1f4e71b9bd261a0",
+      "url": "https://github.com/EssentialsX/Essentials/releases/download/${version}/EssentialsXSpawn-${version}.jar",
+      "info_url": "https://essentialsx.net/wiki/Module-Breakdown.html#essentialsx-spawn"
+    },
+    {
+      "name": "WorldEdit",
+      "version": "7.3.1",
+      "hash": "md5:c44cd1c16c3d84d8efc57bbf417606cb",
+      "url": "https://dev.bukkit.org/projects/worldedit/files/5326355/download",
+      "info_url": "https://dev.bukkit.org/projects/worldedit"
+    },
+    {
+      "name": "WorldGuard",
+      "version": "7.0.9",
+      "hash": "md5:70d6418dd6a2e4492a9f18e5f9ecb10c",
+      "url": "https://dev.bukkit.org/projects/worldguard/files/4675318/download",
+      "info_url": "https://dev.bukkit.org/projects/worldguard"
+    }
+  ]
+}

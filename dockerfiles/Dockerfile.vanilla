@@ -8,7 +8,7 @@ USER minecraft
 WORKDIR /app
 
 # Download and verify sha1sum for server.jar
-RUN set -ux && \
+RUN set -eux && \
 # Grab latest version if not specified
   if [ "$VERSION" = "latest" ]; then \
     VERSION="$( \

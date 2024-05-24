@@ -29,12 +29,24 @@ services:
     environment:
       EULA: "${EULA:-false}"
 
+  minecraft-paper:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.paper
+      args:
+        VERSION: ${VERSION:-latest}
+    image: ${PAPER_IMAGE:-localhost/minecraft}:${PAPER_TAG:-latest-paper}
+    depends_on:
+      - minecraft-jre
+    environment:
+      EULA: "${EULA:-false}"
+
   minecraft-spigot:
     build:
       context: .
       dockerfile: ./dockerfiles/Dockerfile.bukkit
       args:
-        VERSION: ${MINECRAFT_VERSION:-latest}
+        VERSION: ${VERSION:-latest}
         SPIGOT: 'true'
     image: ${SPIGOT_IMAGE:-localhost/minecraft}:${SPIGOT_TAG:-latest-spigot}
     depends_on:
@@ -48,7 +60,7 @@ services:
       context: .
       dockerfile: ./dockerfiles/Dockerfile.bukkit
       args:
-        VERSION: ${MINECRAFT_VERSION:-latest}
+        VERSION: ${VERSION:-latest}
         SPIGOT: 'false'
     image: ${CRAFTBUKKIT_IMAGE:-localhost/minecraft}:${CRAFTBUKKIT_TAG:-latest-craftbukkit}
     depends_on:
