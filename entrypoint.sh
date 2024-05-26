@@ -9,6 +9,7 @@ set_eula() {
   sed -i.bak "s/^eula=.*\$/eula=${EULA:-false}/" "$EULAFILE"
   diff --unified=1 "${EULAFILE}.bak" "$EULAFILE"
   rm "${EULAFILE}.bak"
+  return 0
 }
 
 # Update server.properties using env
