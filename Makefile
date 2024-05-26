@@ -14,11 +14,12 @@ PRUNE_IMAGES = \
 	localhost/minecraft:latest-spigot \
 	localhost/minecraft:latest-craftbukkit \
 	localhost/minecraft-jre:latest \
-	localhost/minecraft-jdk:latest
+	localhost/minecraft-jdk:latest \
+	localhost/velocity:latest
 
 .PHONY: all clean configure craftbukkit default install jdk jre spigot vanilla
 default: vanilla
-all: vanilla paper spigot craftbukkit
+all: vanilla paper spigot craftbukkit velocity
 
 jre:
 	$(DOCKER_COMPOSE_BUILD) minecraft-jre
@@ -37,6 +38,9 @@ spigot: jre jdk
 
 craftbukkit: jre jdk
 	$(DOCKER_COMPOSE_BUILD) minecraft-craftbukkit
+
+velocity: jre
+	$(DOCKER_COMPOSE_BUILD) minecraft-velocity
 
 install:
 	$(DOCKER_COMPOSE_UP)
@@ -70,8 +74,7 @@ define copy_build_files
 			echo "INFO: \"$${SRC_FILE}\" copied to \"$${DEST_FILE}\""; \
 		fi; \
 	else \
-		echo "ERROR: Source file \"$${SRC_FILE}\" does not exist."; \
-		exit 1; \
+		echo "WARN: Source file \"$${SRC_FILE}\" does not exist."; \
 	fi
 endef
 

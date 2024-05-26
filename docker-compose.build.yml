@@ -68,3 +68,15 @@ services:
       - minecraft-jdk
     environment:
       EULA: "${EULA:-false}"
+
+  minecraft-velocity:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.velocity
+      args:
+        VERSION: ${VERSION:-latest}
+    image: ${VELOCITY_IMAGE:-localhost/velocity}:${VELOCITY_TAG:-latest}
+    depends_on:
+      - minecraft-jre
+    environment:
+      EULA: "${EULA:-false}"

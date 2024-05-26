@@ -1,0 +1,90 @@
+FROM "${JRE_IMAGE:-localhost/minecraft-jre}":"${JRE_TAG:-latest}"
+
+# Server version to download
+ARG VERSION=latest
+
+# PaperMC base URL
+ARG BASE_URL="https://api.papermc.io/v2/projects/velocity/versions"
+
+# Consider turning bStats (https://bStats.org) on but I'm turning it off by
+# default because it collects information
+ARG BSTATS_ENABLED=false
+
+# For the entrypoint.sh script
+ENV VELOCITY=true
+
+# Download files
+USER root
+WORKDIR /app
+
+# Install expect
+RUN apt-get update && \
+    apt-get install -y expect && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Download and verify sha256sum for Velocity
+RUN set -eux && \
+  # Grab latest version if not specified
+  if [ "$VERSION" = "latest" ]; then \
+    VERSION="$( \
+      curl -s https://api.papermc.io/v2/projects/velocity | \
+        jq -r '.versions[-1]' \
+    )"; \
+  fi && \
+  # Get latest build for the specified version
+  BUILD="$( \
+    curl -s "${BASE_URL}/${VERSION}" \
+      | jq -r '.builds[-1]' \
+  )" && \
+  URL="${BASE_URL}/${VERSION}/builds/${BUILD}/downloads/velocity-${VERSION}-${BUILD}.jar" && \
+  curl -s -o /tmp/server.jar "$URL" && \
+  # Get SHA256 hash of server.jar and compare
+  SHA256="$(sha256sum /tmp/server.jar | awk '{print $1}')" && \
+  EXPECTED="$( \
+    curl -s "$BASE_URL/$VERSION/builds/$BUILD" \
+      | jq -r '.downloads.application.sha256' \
+  )" && \
+  if [ ! "$SHA256" = "$EXPECTED" ]; then \
+    echo "[ERROR] SHA256=\"$SHA256\" expected \"$EXPECTED\""; \
+    exit 1; \
+  fi && \
+  mv /tmp/server.jar /app/velocity.jar
+
+# Generate files as minecraft user
+USER minecraft
+WORKDIR /app
+
+# Start server to generate initial files
+RUN set -ux; \
+  expect -c "\
+    set timeout -1; \
+    spawn /usr/bin/java -Xms1G -Xmx1G -XX:+UseG1GC -XX:G1HeapRegionSize=4M \
+      -XX:+UnlockExperimentalVMOptions -XX:+ParallelRefProcEnabled \
+      -XX:+AlwaysPreTouch -XX:MaxInlineLevel=15 -jar velocity.jar; \
+    expect -re {\[[0-9]{2}:[0-9]{2}:[0-9]{2} INFO\]: Done .*!} { \
+      send \"stop\r\"; \
+      expect eof \
+    } \
+  " && \
+  # Disable bStats by default and clear server-uuid
+  cd /app/plugins/bStats/ || exit 1; \
+  sed -i.bak "s/^enabled=.*\$/enabled=${BSTATS_ENABLED}/" config.txt && \
+  diff --unified=1 config.txt.bak config.txt || true && rm config.txt.bak && \
+  sed -i.bak "s/^server-uuid=.*\$/server-uuid=/" config.txt && \
+  diff --unified=1 config.txt.bak config.txt || true && rm config.txt.bak && \
+  # Truncate forwarding secret
+  truncate -s 0 /app/forwarding.secret
+
+# Back to root to copy the entrypoint in
+USER root
+COPY ../entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Run app as minecraft user
+USER minecraft
+WORKDIR /app
+
+# Expose port and run entrypoint script
+EXPOSE 25565
+ENTRYPOINT ["entrypoint.sh"]
