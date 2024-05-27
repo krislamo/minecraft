@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -eux
 
 # Set eula value in eula.txt
 set_eula() {
@@ -7,9 +7,8 @@ set_eula() {
   EULA="${1:-false}"
   EULAFILE="${EULAFILE:-/app/eula.txt}"
   sed -i.bak "s/^eula=.*\$/eula=${EULA:-false}/" "$EULAFILE"
-  diff --unified=1 "${EULAFILE}.bak" "$EULAFILE"
+  diff --unified=1 "${EULAFILE}.bak" "$EULAFILE" || true
   rm "${EULAFILE}.bak"
-  return 0
 }
 
 # Update server.properties using env
