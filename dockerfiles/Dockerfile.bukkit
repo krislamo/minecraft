@@ -14,6 +14,10 @@ ARG PREFIX="PLUGIN_"
 ARG BASE_URL="https://hub.spigotmc.org/jenkins/job/BuildTools/"
 ARG ARTIFACT_PATH="lastSuccessfulBuild/artifact/target/BuildTools.jar"
 
+# Consider turning bStats (https://bStats.org) on but I'm turning it off by
+# default because it collects information
+ARG BSTATS_ENABLED=false
+
 # Build in common container location
 WORKDIR /build
 
@@ -108,7 +112,12 @@ COPY --from=build /build/server.jar /app/server.jar
 COPY --from=build /plugins/ /app/plugins/
 
 # Generate initial settings
-RUN java -jar server.jar --initSettings --nogui
+RUN java -jar server.jar --initSettings --nogui && \
+  # Disable bStats by default
+  if [ "$BSTATS_ENABLED" = "false" ]; then \
+    mkdir -p /app/plugins/bStats/ && \
+    echo "enabled: false" > /app/plugins/bStats/config.yml; \
+  fi
 
 # Back to root to copy the entrypoint in
 USER root

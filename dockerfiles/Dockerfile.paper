@@ -9,6 +9,10 @@ ARG PREFIX="PLUGIN_"
 # PaperMC base URL
 ARG BASE_URL="https://api.papermc.io/v2/projects/paper/versions/${VERSION}"
 
+# Consider turning bStats (https://bStats.org) on but I'm turning it off by
+# default because it collects information
+ARG BSTATS_ENABLED=false
+
 # Download files
 USER root
 WORKDIR /app
@@ -95,7 +99,12 @@ RUN set -eux && \
 # Generate initial settings
 USER minecraft
 WORKDIR /app
-RUN java -jar server.jar --initSettings --nogui
+RUN java -jar server.jar --initSettings --nogui && \
+  # Disable bStats by default
+  if [ "$BSTATS_ENABLED" = "false" ]; then \
+    mkdir -p /app/plugins/bStats/ && \
+    echo "enabled: false" > /app/plugins/bStats/config.yml; \
+  fi
 
 # Back to root to copy the entrypoint in
 USER root

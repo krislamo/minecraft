@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eux
+set -eu
 
 # Set eula value in eula.txt
 set_eula() {
