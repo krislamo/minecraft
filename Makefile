@@ -61,34 +61,34 @@ define copy_build_files
 				sed -i 's/EULA=true/EULA=false/' "$${TEMP_DEST_FILE}"; \
 			fi; \
 			if cmp -s "$${SRC_FILE}" "$${TEMP_DEST_FILE}"; then \
-				echo "INFO: \"$${DEST_FILE}\" is up to date."; \
+				echo "[INFO]: \"$${DEST_FILE}\" is up to date."; \
 				rm "$${TEMP_DEST_FILE}"; \
 			else \
-				echo "ERROR: \"$${DEST_FILE}\" is different from \"$${SRC_FILE}\""; \
+				echo "[ERROR]: \"$${DEST_FILE}\" is different from \"$${SRC_FILE}\""; \
 				diff -u "$${DEST_FILE}" "$${SRC_FILE}"; \
 				rm "$${TEMP_DEST_FILE}"; \
 				exit 1; \
 			fi; \
 		else \
 			cp "$${SRC_FILE}" "$${DEST_FILE}"; \
-			echo "INFO: \"$${SRC_FILE}\" copied to \"$${DEST_FILE}\""; \
+			echo "[INFO]: \"$${SRC_FILE}\" copied to \"$${DEST_FILE}\""; \
 		fi; \
 	else \
-		echo "WARN: Source file \"$${SRC_FILE}\" does not exist."; \
+		echo "[WARN]: Source file \"$${SRC_FILE}\" does not exist."; \
 	fi
 endef
 
 configure:
 	@if [ -d "./builds/$(BUILD)" ]; then \
-		echo "INFO: Configuring build $(BUILD) (./builds/$(BUILD))" && \
+		echo "[INFO]: Configuring build $(BUILD) (./builds/$(BUILD))" && \
 		$(call copy_build_files,$(BUILD),.env); \
 		$(call copy_build_files,$(BUILD),plugins.json); \
 	elif [ -d "./scratch/$(BUILD)" ]; then \
-		echo "INFO: Configuring build $(BUILD) (./scratch/$(BUILD))" && \
+		echo "[INFO]: Configuring build $(BUILD) (./scratch/$(BUILD))" && \
 		$(call copy_build_files,$(BUILD),.env,scratch); \
 		$(call copy_build_files,$(BUILD),plugins.json,scratch); \
 	else \
-		echo "ERROR: Build directory for \"$(BUILD)\" not found"; \
+		echo "[ERROR]: Build directory for \"$(BUILD)\" not found"; \
 		exit 1; \
 	fi
 

@@ -36,7 +36,7 @@ RUN set -eux && \
     false) \
       JAVA_TYPE='jdk' ;; \
     *) \
-      echo "ERROR: Invalid value for JAVA_RUNTIME. Set to 'true' or 'false'"; \
+      echo "[ERROR]: Invalid value for JAVA_RUNTIME. Set to 'true' or 'false'"; \
       exit 1 ;; \
   esac && \
   # Install the Temurin version

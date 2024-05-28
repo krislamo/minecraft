@@ -40,7 +40,7 @@ RUN set -eux && \
       | jq -r '.downloads.application.sha256' \
   )" && \
   if [ ! "$SHA256" = "$EXPECTED" ]; then \
-    echo "[ERROR] SHA256=\"$SHA256\" expected \"$EXPECTED\""; \
+    echo "[ERROR]: SHA256=\"$SHA256\" expected \"$EXPECTED\""; \
     exit 1; \
   fi && \
   mv /tmp/server.jar /app/server.jar

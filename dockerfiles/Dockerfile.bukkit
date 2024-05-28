@@ -39,7 +39,7 @@ RUN set -eux && \
     false) \
       BUILD_TYPE='CRAFTBUKKIT' ;; \
     *) \
-      echo "ERROR: Invalid value for SPIGOT. Set to 'true' or 'false'"; \
+      echo "[ERROR]: Invalid value for SPIGOT. Set to 'true' or 'false'"; \
       exit 1 ;; \
   esac && \
   # Run BuildTools to build specified version

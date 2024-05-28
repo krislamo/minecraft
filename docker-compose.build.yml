@@ -74,7 +74,7 @@ services:
       context: .
       dockerfile: ./dockerfiles/Dockerfile.velocity
       args:
-        VERSION: ${VERSION:-latest}
+        VERSION: ${VELOCITY_VERSION:-latest}
     image: ${VELOCITY_IMAGE:-localhost/velocity}:${VELOCITY_TAG:-latest}
     depends_on:
       - minecraft-jre

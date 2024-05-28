@@ -25,7 +25,7 @@ RUN set -eux && \
   SHA1="$(sha1sum server.jar | awk '{print $1}')" && \
   EXPECTED="$(jq -r .sha1 /tmp/dl.json)"; rm /tmp/dl.json && \
   if [ ! "$SHA1" = "$EXPECTED" ]; then \
-    echo "[ERROR] SHA1=\"$SHA1\" expected \"$EXPECTED\""; \
+    echo "[ERROR]: SHA1=\"$SHA1\" expected \"$EXPECTED\""; \
     exit 1; \
   fi
 
